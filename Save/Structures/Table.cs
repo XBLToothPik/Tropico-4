@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Tropico.Methods;
+
 namespace Tropico.GameSave.Structs
 {
     public class Table
@@ -53,52 +54,5 @@ namespace Tropico.GameSave.Structs
                     return Entries[i];
             return null;
         }
-    }
-    public class Entry
-    {
-        public Int32 Offset { get; set; }
-        public Int32 Length { get; set; }
-        public Stream CustomStream { get; set; }
-        public int EID;
-        Stream xMain;
-        public Entry(Stream xIn, int EID)
-        {
-            xMain = xIn;
-            Offset = StreamUtils.ReadInt32(xIn, false);
-            this.EID = EID;
-        }
-        public void ExtractToStream(Stream xOut)
-        {
-            if (CustomStream != null)
-                CustomStream.Position = 0;
-            else
-                xMain.Position = Offset;
-
-            if (CustomStream == null)
-                StreamUtils.ReadBufferedStream(xMain, Length, xOut);
-            else
-                StreamUtils.ReadBufferedStream(CustomStream, (int)CustomStream.Length, xOut);
-        }
-    }
-    public class Header
-    {
-        public string Magic { get; set; }
-        public Int32 Count { get; set; }
-        public Int16 Unk { get; set; }
-
-        public Header(Stream xIn)
-        {
-            Magic = new string(StreamUtils.ReadChars(xIn, 6));
-            Count = StreamUtils.ReadInt32(xIn, false) + 1;
-            Unk = StreamUtils.ReadInt16(xIn, false);
-        }
-
-        public void Write(Stream xOut)
-        {
-            StreamUtils.WriteChars(xOut, Magic.ToCharArray());
-            StreamUtils.WriteInt32(xOut, Count - 1, false);
-            StreamUtils.WriteInt16(xOut, Unk, false);
-        }
-
     }
 }
